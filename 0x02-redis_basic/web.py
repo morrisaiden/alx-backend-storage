@@ -23,8 +23,6 @@ def cache(fn):
             # Increment the access count
             r.incr(count_key)
             return cached_content.decode('utf-8')
-
-
         content = fn(*args, **kwargs)
         r.setex(cache_key, CACHE_EXPIRATION_TIME, content)
         r.set(count_key, 1)
