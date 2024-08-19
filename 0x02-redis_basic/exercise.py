@@ -4,6 +4,7 @@ import uuid
 from typing import Union, Callable, Optional
 import functools
 
+
 def count_calls(method: Callable) -> Callable:
     """Decorator to count the number of times a method is called."""
     @functools.wraps(method)
@@ -12,6 +13,7 @@ def count_calls(method: Callable) -> Callable:
         self._redis.incr(key)
         return method(self, *args, **kwargs)
     return wrapper
+
 
 def call_history(method: Callable) -> Callable:
     """Decorator to store the history of inputs and outputs of a function."""
@@ -27,6 +29,7 @@ def call_history(method: Callable) -> Callable:
         return output
     return wrapper
 
+
 def replay(method: Callable):
     """Display the history of calls of a particular function."""
     r = redis.Redis()
@@ -39,7 +42,9 @@ def replay(method: Callable):
     print(f"{method.__qualname__} was called {len(inputs)} times:")
 
     for input_args, output in zip(inputs, outputs):
-        print(f"{method.__qualname__}(*{input_args.decode('utf-8')}) -> {output.decode('utf-8')}")
+        print(f"{method.__qualname__}
+              (*{input_args.decode('utf-8')}) -> {output.decode('utf-8')}")
+
 
 class Cache:
     def __init__(self):
