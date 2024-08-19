@@ -43,9 +43,7 @@ def replay(method: Callable):
 
     for input_args, output in zip(inputs, outputs):
         print(f"
-              {method.__qualname__}(*{
-                  input_args.decode('utf-8')
-                  }) -> {
+              {method.__qualname__}(*{input_args.decode('utf-8')}) -> {
                       output.decode('utf-8')
                       }")
 
