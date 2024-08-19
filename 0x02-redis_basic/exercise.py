@@ -21,18 +21,33 @@ def call_history(method: Callable) -> Callable:
         output_key = f"{method.__qualname__}:outputs"
         # Store the inputs
         self._redis.rpush(input_key, str(args))
+        # Call the method and store the outputs
         output = method(self, *args, **kwargs)
         self._redis.rpush(output_key, str(output))
         return output
     return wrapper
+
+def replay(method: Callable):
+    """Display the history of calls of a particular function."""
+    r = redis.Redis()
+    input_key = f"{method.__qualname__}:inputs"
+    output_key = f"{method.__qualname__}:outputs"
+
+    inputs = r.lrange(input_key, 0, -1)
+    outputs = r.lrange(output_key, 0, -1)
+
+    print(f"{method.__qualname__} was called {len(inputs)} times:")
+
+    for input_args, output in zip(inputs, outputs):
+        print(f"{method.__qualname__}(*{input_args.decode('utf-8')}) -> {output.decode('utf-8')}")
 
 class Cache:
     def __init__(self):
         self._redis = redis.Redis()
         self._redis.flushdb()
 
-    @call_history
-    @count_calls
+    @call_history  # Decorate with call_history first
+    @count_calls  # Then decorate with count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         key = str(uuid.uuid4())
         self._redis.set(key, data)
